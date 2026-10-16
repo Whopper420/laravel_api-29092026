@@ -25,6 +25,10 @@ export function deletePost(id) {
   return apiRequest(`${API_URL}/posts/${id}`, { method: "DELETE" });
 }
 
+function isRecord(value) {
+  return typeof value === "object" && value !== null;
+}
+
 // The API may answer with a plain array, { data: [...] } or a paginated
 // { data: { data: [...] } }. Normalises all three shapes.
 export function parsePostList(payload) {
@@ -32,11 +36,15 @@ export function parsePostList(payload) {
     return payload;
   }
 
+  if (!isRecord(payload)) {
+    return [];
+  }
+
   if (Array.isArray(payload.data)) {
     return payload.data;
   }
 
-  if (payload.data && Array.isArray(payload.data.data)) {
+  if (isRecord(payload.data) && Array.isArray(payload.data.data)) {
     return payload.data.data;
   }
 
